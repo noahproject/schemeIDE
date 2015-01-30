@@ -19,14 +19,20 @@ class SchemeIDE(tk.Frame):
 
     def create_toolbar(self, r):
         '''Creates a run button that will execute code in the editor.'''
-        self.runButton = tk.Button(r, text='Run', command=self.run_code)
-        self.runButton.pack()
+        hpane = tk.PanedWindow(bg='black') # Horizontal panel
+        hpane.pack(fill=tk.BOTH, expand=1)
+
+        self.runButton = tk.Button(r, bg='blue', fg='white', text='Run', \
+                                   command=self.run_code)
+        spacer = tk.Frame(width=40, bg='black')
+        hpane.add(self.runButton)
+        hpane.add(spacer)
 
     def create_editor(self, r):
         '''Creates a text box that a user can type code into.'''
-        self.editor = tk.Text(r,height=20,width=60,bg='black',fg='white', \
-                         insertbackground='blue')
-        self.editor.pack()
+        self.editor = SchemeText(r, height=20, width=60, bg='black', \
+                                 fg='white', insertbackground='blue')
+        
 
     def create_console(self, r):
         '''Creates a console for program output.'''
@@ -36,7 +42,7 @@ class SchemeIDE(tk.Frame):
         self.console.pack()
 
     def run_code(self):
-        '''Runs (python) code from editor and displays stdout in console.'''
+        '''Runs (python) code in editor and displays stdout in console.'''
         f = open('output.py', 'w')
         f.write(self.editor.get("1.0", tk.END))
         f.close()
@@ -48,8 +54,53 @@ class SchemeIDE(tk.Frame):
         self.console.insert(tk.END, '-> ')
         self.console.config(state=tk.DISABLED)
 
+
+class SchemeText(tk.Text):
+    '''
+    Scheme Text
+    
+    Text widget that does (basic) keyword coloring for Scheme text.
+    '''
+
+    def __init__(self, *args, **kwargs):
+        '''Sets the values of the tags and key press handler.'''
+        tk.Text.__init__(self, *args, **kwargs)
+        self.tag_configure("red", foreground="#ff0000")
+        self.tag_configure("blue", foreground="#0000ff")
+        self.tag_configure("green", foreground="#00ff00")
+        self.bind("<Key>", self.key)
+        self.pack()
+        
+    def highlight_pattern(self, pattern, tag):
+        '''Colors pattern with the color from tag.'''
+        self.mark_set("matchStart", '1.0')
+        self.mark_set("matchEnd", '1.0')
+        self.mark_set("searchLimit", self.index("end"))
+
+        count = tk.IntVar()
+        while True:
+            index = self.search(pattern, "matchEnd","searchLimit",
+                                count=count)
+            if index == "": break
+            self.mark_set("matchStart", index)
+            self.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+            self.tag_add(tag, "matchStart", "matchEnd")
+
+    def key(self, event):
+        '''Updates the text color on space bar presses.'''
+        if event.char == ' ':
+            self.highlight_pattern("(", "red")
+            self.highlight_pattern(")", "red")
+            self.highlight_pattern("define", "blue")
+            self.highlight_pattern("lambda", "blue")
+            self.highlight_pattern("+", "green")
+            self.highlight_pattern("-", "green")  
+            self.highlight_pattern("*", "green")
+            self.highlight_pattern("/", "green")
+
 if __name__ == '__main__':
     root = tk.Tk()
+    root.configure(background='black')
     root.title('Scheme IDE Beta Version')
     app = SchemeIDE(master=root)
     app.mainloop()
