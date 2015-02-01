@@ -33,7 +33,6 @@ class SchemeIDE(tk.Frame):
         self.editor = SchemeText(r, height=20, width=60, bg='black', \
                                  fg='white', insertbackground='blue')
         
-
     def create_console(self, r):
         '''Creates a console for program output.'''
         self.console = tk.Text(r,height=10,width=60,bg='black',fg='white')
@@ -53,7 +52,6 @@ class SchemeIDE(tk.Frame):
         self.console.insert(tk.END, output)
         self.console.insert(tk.END, '-> ')
         self.console.config(state=tk.DISABLED)
-
 
 class SchemeText(tk.Text):
     '''
@@ -87,16 +85,18 @@ class SchemeText(tk.Text):
             self.tag_add(tag, "matchStart", "matchEnd")
 
     def key(self, event):
-        '''Updates the text color on space bar presses.'''
-        if event.char == ' ':
-            self.highlight_pattern("(", "red")
-            self.highlight_pattern(")", "red")
-            self.highlight_pattern("define", "blue")
-            self.highlight_pattern("lambda", "blue")
-            self.highlight_pattern("+", "green")
-            self.highlight_pattern("-", "green")  
-            self.highlight_pattern("*", "green")
-            self.highlight_pattern("/", "green")
+        '''Updates the text color on key presses.'''
+        self.tag_remove("red", '1.0', 'end')
+        self.tag_remove("blue", '1.0', 'end')
+        self.tag_remove("green", '1.0', 'end')        
+        self.highlight_pattern("(", "red")
+        self.highlight_pattern(")", "red")
+        self.highlight_pattern("define", "blue")
+        self.highlight_pattern("lambda", "blue")
+        self.highlight_pattern("+", "green")
+        self.highlight_pattern("-", "green")  
+        self.highlight_pattern("*", "green")
+        self.highlight_pattern("/", "green")
 
 if __name__ == '__main__':
     root = tk.Tk()
