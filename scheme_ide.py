@@ -18,15 +18,18 @@ class SchemeIDE(tk.Frame):
         self.create_console(master)
 
     def create_toolbar(self, r):
-        '''Creates a run button that will execute code in the editor.'''
-        hpane = tk.PanedWindow(bg='black') # Horizontal panel
-        hpane.pack(fill=tk.BOTH, expand=1)
+        menubar = tk.Menu(r)
 
-        self.runButton = tk.Button(r, bg='blue', fg='white', text='Run', \
-                                   command=self.run_code)
-        spacer = tk.Frame(width=40, bg='black')
-        hpane.add(self.runButton)
-        hpane.add(spacer)
+        filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Open")
+        filemenu.add_command(label="Save")
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit")
+        menubar.add_cascade(label="File", menu=filemenu)
+
+        menubar.add_command(label="Run", command=self.run_code)
+
+        r.config(menu=menubar)
 
     def create_editor(self, r):
         '''Creates a text box that a user can type code into.'''
