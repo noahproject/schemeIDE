@@ -18,18 +18,15 @@ class SchemeIDE(tk.Frame):
         self.create_console(master)
 
     def create_toolbar(self, r):
-        menubar = tk.Menu(r)
+        '''Creates a run button that will execute code in the editor.'''
+        hpane = tk.PanedWindow(bg='black') # Horizontal panel
+        hpane.pack(fill=tk.BOTH, expand=1)
 
-        filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Open", command=self.open_file)
-        filemenu.add_command(label="Save", command=self.save_file)
-        filemenu.add_separator()
-        filemenu.add_command(label="Exit")
-        menubar.add_cascade(label="File", menu=filemenu)
-
-        menubar.add_command(label="Run", command=self.run_code)
-
-        r.config(menu=menubar)
+        self.runButton = tk.Button(r, bg='blue', fg='white', text='Run', \
+                                   command=self.run_code)
+        spacer = tk.Frame(width=40, bg='black')
+        hpane.add(self.runButton)
+        hpane.add(spacer)
 
     def create_editor(self, r):
         '''Creates a text box that a user can type code into.'''
@@ -55,20 +52,6 @@ class SchemeIDE(tk.Frame):
         self.console.insert(tk.END, output)
         self.console.insert(tk.END, '-> ')
         self.console.config(state=tk.DISABLED)
-
-    def open_file(self):
-        path = tk.filedialog.askopenfilename(parent=self)
-        if path == None: return
-        file = open(path, "r")
-        self.editor.set_all(file.read())
-        file.close()
-
-    def save_file(self):
-        path = tk.filedialog.asksaveasfilename(parent=self)
-        if path == None: return
-        file = open(path, "w")
-        file.write(self.editor.get_all())
-        file.close()
 
 class SchemeText(tk.Text):
     '''
@@ -114,15 +97,6 @@ class SchemeText(tk.Text):
         self.highlight_pattern("-", "green")  
         self.highlight_pattern("*", "green")
         self.highlight_pattern("/", "green")
-
-    def set_all(self, string):
-        # Sets the contents of the text box to this string.
-        self.delete(1.0, tk.END)
-        self.insert(1.0, string)
-
-    def get_all(self):
-        # Returns full contents of the text box.
-        return self.get(1.0, tk.END)
 
 if __name__ == '__main__':
     root = tk.Tk()
