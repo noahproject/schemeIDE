@@ -59,6 +59,14 @@ class TestSchemeIDE(unittest.TestCase):
         self.app.mainloop()
         self.assertEqual(output, "-> \n Error!\n-> ", 'Invalid code breaks console format.')
 
+    def test_shell_evaluation(self):
+        self.app.console.insert('1.3', '(+ 2 2)')
+        output = self.app.console.get('2.0' '3.0')
+        self.app.after(1, self._kill)
+        self.app.mainloop()
+        self.assertEqual(output, '4\n')
+        
+
 		
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestSchemeIDE)
