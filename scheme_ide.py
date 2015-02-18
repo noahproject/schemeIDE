@@ -35,12 +35,11 @@ class SchemeIDE(tk.Frame):
         '''Creates a text box that a user can type code into.'''
         self.editor = SchemeText(r, height=20, width=60, bg='black', \
                                  fg='white', insertbackground='blue')
+        self.editor.pack()
         
     def create_console(self, r):
         '''Creates a console for program output.'''
-        self.console = tk.Text(r,height=10,width=60,bg='black',fg='white')
-        self.console.insert(tk.END, '-> ');
-        self.console.config(state=tk.DISABLED)
+        self.console = SchemeShell(r,height=10,width=60,bg='black',fg='white')
         self.console.pack()
 
     def run_code(self):
@@ -70,6 +69,29 @@ class SchemeIDE(tk.Frame):
         file.write(self.editor.get_all())
         file.close()
 
+class SchemeShell(tk.Text):
+    '''
+    Scheme Shell
+
+    Shell widget that allows a user to type a line of Scheme and evaluate it.
+    '''
+
+    def __init__(self, *args, **kwargs):
+        self.line = 1
+        tk.Text.__init__(self, *args, **kwargs)
+        self.insert('end', '-> ')
+        self.bind("<Key>", self._key)
+
+    def _key(self, event):
+        if event.char == '\r':
+            print(self.get(str(self.line)+'.3', 'end'))
+            self.line = self.line + 1
+            self.insert('end', '\n')
+            self.insert('end', '-> ')
+            self.mark_set('insert', '1.3')
+
+            
+
 class SchemeText(tk.Text):
     '''
     Scheme Text
@@ -84,7 +106,6 @@ class SchemeText(tk.Text):
         self.tag_configure("blue", foreground="#0000ff")
         self.tag_configure("green", foreground="#00ff00")
         self.bind("<Key>", self.key)
-        self.pack()
         
     def highlight_pattern(self, pattern, tag):
         '''Colors pattern with the color from tag.'''
